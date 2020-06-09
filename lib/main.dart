@@ -4,6 +4,11 @@ import 'package:login_pages/MyHomePage.dart';
 import 'package:login_pages/MyAppState.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:android_intent/android_intent.dart';
+import 'package:geolocator/geolocator.dart';
+
 void main() {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
@@ -19,7 +24,64 @@ class MyApp extends StatefulWidget {
 class _State extends State<MyApp> {
   TextEditingController nameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  final PermissionHandler permissionHandler = PermissionHandler();
+  Map<PermissionGroup, PermissionStatus> permissions;
+  void initState() {
+    super.initState();
+    requestLocationPermission();
+    _gpsService();
+  }
+  Future<bool> _requestPermission(PermissionGroup permission) async {
+    final PermissionHandler _permissionHandler = PermissionHandler();
+    var result = await _permissionHandler.requestPermissions([permission]);
+    if (result[permission] == PermissionStatus.granted) {
+      return true;
+    }
+    return false;
+  }
+/*Checking if your App has been Given Permission*/
+  Future<bool> requestLocationPermission({Function onPermissionDenied}) async {
+    var granted = await _requestPermission(PermissionGroup.location);
+    if (granted!=true) {
+      requestLocationPermission();
+    }
+    debugPrint('requestContactsPermission $granted');
+    return granted;
+  }
+/*Show dialog if GPS not enabled and open settings location*/
+  Future _checkGps() async {
+    if (!(await Geolocator().isLocationServiceEnabled())) {
+      if (Theme.of(context).platform == TargetPlatform.android) {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text("Can't get gurrent location"),
+                content:const Text('Please make sure you enable GPS and try again'),
+                actions: <Widget>[
+                  FlatButton(child: Text('Ok'),
+                      onPressed: () {
+                        final AndroidIntent intent = AndroidIntent(
+                            action: 'android.settings.LOCATION_SOURCE_SETTINGS');
+                        intent.launch();
+                        Navigator.of(context, rootNavigator: true).pop();
+                        _gpsService();
+                      })],
+              );
+            });
+      }
+    }
 
+  }
+
+/*Check if gps service is enabled or not*/
+  Future _gpsService() async {
+    if (!(await Geolocator().isLocationServiceEnabled())) {
+      _checkGps();
+      return null;
+    } else
+      return true;
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,26 +146,10 @@ class _State extends State<MyApp> {
                     child: RaisedButton(
                       textColor: Colors.white,
                       color: Colors.blue,
-                      child: Text('Login'),
+                      child: Text('Login' ,textScaleFactor: 1.4,),
                       onPressed: () {
-                        StreamBuilder(
-                            stream: Connectivity().onConnectivityChanged,
-                            builder: (BuildContext ctxt,
-                                AsyncSnapshot<ConnectivityResult> snapShot) {
-                              if (!snapShot.hasData) return CircularProgressIndicator();
-                              var result = snapShot.data;
-                              switch (result) {
-                                case ConnectivityResult.none:
-                                  print("no net");
-                                  return Center(child: Text("No Internet Connection!"));
-                                case ConnectivityResult.mobile:
-                                case ConnectivityResult.wifi:
-                                  print("yes net");
-                                  return  MyAppState();
-                                  default:
-                                  return Center(child: Text("No Internet Connection!"));
-                              }
-                            });
+
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=>MyAppState()));
                         print(nameController.text);
                         print(passwordController.text);
                       },
@@ -115,7 +161,7 @@ class _State extends State<MyApp> {
                         FlatButton(
                           textColor: Colors.blue,
                           child: Text(
-                            'Sign in',
+                            'Sign up',
                             style: TextStyle(fontSize: 20),
                           ),
                           onPressed: () {

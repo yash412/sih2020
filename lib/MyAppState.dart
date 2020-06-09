@@ -1,10 +1,16 @@
 import 'dart:io';
+import 'dart:async';
+
 
 import 'package:flutter/material.dart';
 import 'package:login_pages/profile.dart';
 import 'package:camera/camera.dart';
-import 'package:login_pages/camera_screen.dart';
+import 'package:login_pages/TakePictureScreen.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:login_pages/permission.dart';
+import 'package:login_pages/DashBoard.dart';
+import 'package:path/path.dart' show join;
+import 'package:path_provider/path_provider.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -13,10 +19,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
-        appBar: AppBar(
-          title: Text('Form Demo'),
-        ),
+
         body: MyAppState(),
       ),
     );
@@ -65,7 +70,10 @@ class MyAppState extends StatelessWidget {
                   shape: RoundedRectangleBorder(
 
                       borderRadius: BorderRadius.all(Radius.circular(16.0))),
-                 onPressed: () { picker();}
+                 onPressed: () { picker();
+                  // Navigator.push(context, MaterialPageRoute(builder: (context)=>TakePictureScreen( camera: picker(),)));
+
+                     }
                  ),
 
 
@@ -87,7 +95,9 @@ class MyAppState extends StatelessWidget {
                   elevation: 5,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(16.0))),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=>permission()));
+                  },
                 ),
                 RaisedButton(
                   child: Text('History'),
@@ -96,7 +106,9 @@ class MyAppState extends StatelessWidget {
                   elevation: 5,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(16.0))),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=>DashBoard()));
+                  },
                 ),
               ])
     ),

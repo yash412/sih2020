@@ -5,11 +5,11 @@ final TextEditingController _pass = TextEditingController();
 final TextEditingController _confirmPass = TextEditingController();
 String _email;
 void main() => runApp(new MyApp());
-
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Form Demo',
       theme: new ThemeData(
         primarySwatch: Colors.blue,
@@ -29,29 +29,21 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
-  List<String> _colors = <String>[
-    '',
-    'Maharashtra',
-    'Kerala',
-    'Assam',
-    'Madhaya pradesh'
-  ];
-  String _color = '';
-  String _dist = '';
-  List<String> _dists = <String>[
-    '',
-    'Buldhana',
-    'Akola',
-    'Yawatmal',
-    'Jalgaon'
-  ];
-
+  var _offices = ['',
+    'xyz,bhuldana,Maharashtra',
+    'lmn,akola,Maharashtra',
+    'stu,akola,Maharashtra',
+    'abc,ernakulam,Kerala',
+    'uvw,kucci,Assam',
+    'pqr,jabalpur,Madhaya pradesh'];
+  var _currentItemSelected = '';
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text(widget.title),
+        title: Text('Registration form'),
+
       ),
       body: new SafeArea(
           top: false,
@@ -123,7 +115,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       return null;
                     },
                     decoration: const InputDecoration(
-                      icon: const Icon(Icons.add_circle),
+                      icon: const Icon(Icons.add_circle_outline),
                       hintText: 'Confirm password',
                       labelText: 'Confirm password',
                     ),
@@ -136,73 +128,84 @@ class _MyHomePageState extends State<MyHomePage> {
                       return InputDecorator(
                         decoration: InputDecoration(
                           icon: const Icon(Icons.add_location),
-                          labelText: 'State',
+                          labelText: 'Office',
+                          hintText: 'Office',
                         ),
-                        isEmpty: _color == '',
+
                         child: new DropdownButtonHideUnderline(
                           child: new DropdownButton(
-                            value: _color,
-                            isDense: true,
-                            onChanged: (String newValue) {
-                              setState(() {
-                                var newContact;
-                                newContact.favoriteColor = newValue;
-                                _color = newValue;
-                                state.didChange(newValue);
-                              });
-                            },
-                            items: _colors.map((String value) {
-                              return new DropdownMenuItem(
-                                value: value,
-                                child: new Text(value),
+                            isDense: true ,
+
+                            items: _offices.map((String dropDownItem) {
+                              return  DropdownMenuItem(
+                                value:dropDownItem ,
+                                child: Text(dropDownItem),
                               );
                             }).toList(),
+
+                            onChanged: (String newValueselected){
+                              setState(() {
+                                this._currentItemSelected = newValueselected;
+                              });
+                            },
+
+                            value: _currentItemSelected,
                           ),
                         ),
                       );
                     },
+                  ),
+                  new Container(
+                    padding: const EdgeInsets.only( top: 40.0),
+                    width: 250.0,
+                    height: 85.0,
+
+                    child: new RaisedButton(
+                      child: Text('Add Faces'),
+
+                        onPressed: (){
+
+                        }),
                   ),
 
-                  new FormField(
-                    builder: (FormFieldState state) {
-                      return InputDecorator(
-                        decoration: InputDecoration(
-                          icon: const Icon(Icons.add_location),
-                          labelText: 'District',
-                        ),
-                        isEmpty: _dist == '',
-                        child: new DropdownButtonHideUnderline(
-                          child: new DropdownButton(
-                            value: _dist,
-                            isDense: true,
-                            onChanged: (String newValue) {
-                              setState(() {
-                                var newContact;
-                                newContact.favoriteColor = newValue;
-                                _dist = newValue;
-                                state.didChange(newValue);
-                              });
-                            },
-                            items: _dists.map((String value) {
-                              return new DropdownMenuItem(
-                                value: value,
-                                child: new Text(value),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
 
                   new Container(
-                      padding: const EdgeInsets.only(left: 40.0, top: 20.0),
-                      child: new RaisedButton(
-                        child: const Text('Submit'),
-                        onPressed: null,
-                      )),
+                    padding: const EdgeInsets.only( top: 40.0),
+                    width: 250.0,
+                    height: 85.0,
+
+                    child: new RaisedButton(
+                        color: Colors.red,
+                        child:  Text(
+                          "Submit",
+                          style: TextStyle(
+                              fontSize: 20.0,
+                              color:Colors.white,
+                              fontFamily:'Raleway',
+                              fontWeight: FontWeight.w700
+                          ),
+                        ),
+                        elevation: 9.0,
+                        onPressed: () => bookFlight(context)
+                    ),
+                  ),
+
+
                 ],
               ))),
     );
   }
+
+  void bookFlight(BuildContext context) {
+    var alertDialog = AlertDialog(
+      title: Text("Form submitted successfully!"),
+    );
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) => alertDialog
+    );
+  }
 }
+
+
